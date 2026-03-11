@@ -1,0 +1,185 @@
+-- fixed by me and idk who made this
+local cursorkey = "8" 
+local enemykey = "7"
+ 
+local lp = game.Players.LocalPlayer
+local gui = lp.PlayerGui
+local rs = game.ReplicatedStorage
+local ms = lp:GetMouse()
+
+local findorigin = game.ReplicatedStorage.animationSets.TPanimSets["2H"]:GetChildren()
+for i,findanim in ipairs(findorigin) do
+    if findanim:IsA("Animation") then
+        if findanim.Name == "swing" then
+            findanim.AnimationId = game.ReplicatedStorage.animationSets.TPanimSets["2QU"].swing.AnimationId
+        end
+        if findanim.Name == "swing2" then
+            findanim.AnimationId = game.ReplicatedStorage.animationSets.TPanimSets["2QU"].swing2.AnimationId
+        end
+        if findanim.Name == "block" then
+            findanim.AnimationId = game.ReplicatedStorage.animationSets.TPanimSets["2QU"].bulletblock.AnimationId
+        end
+        if findanim.Name == "equip" then
+            findanim.AnimationId = game.ReplicatedStorage.animationSets.TPanimSets["2QU"].equip.AnimationId
+        end
+        if findanim.Name == "charge" then
+            findanim.AnimationId = game.ReplicatedStorage.animationSets.TPanimSets["2QU"].charge.AnimationId
+        end
+    end
+end
+
+local active = true
+
+game:GetService("StarterGui"):SetCore("SendNotification",{
+    Title = "fucking awesome",
+    Text = "Loaded.",
+})
+game:GetService("StarterGui"):SetCore("SendNotification",{
+    Title = "CONTROLS",
+    Text = "7 to jump to nearest enemy",
+})
+game:GetService("StarterGui"):SetCore("SendNotification",{
+    Title = "CONTROLS",
+    Text = "8 to jump to your cursor",
+})
+
+local function doAttack(targetPos)
+    local hrp = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart
+    local char = game:GetService("Players").LocalPlayer.Character
+    local plr = game:GetService("Players").LocalPlayer
+
+    local queenanim = plr.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.animationSets.TPanimSets.special.queen_jump)
+    queenanim:Play()
+
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "shotshell_windup", hrp)
+    wait(0.3)
+    hrp.AssemblyLinearVelocity = Vector3.new(0,100,0)
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "shotshell_fire", hrp)
+    workspace.ServerStuff.applyGore:FireServer("shotshell_blast", char, plr, {hrp.Position - Vector3.new(0,1.5,0)})
+
+    wait(0.4)
+    workspace.ServerStuff.applyGore:FireServer("shotshell_blast", char, plr, {hrp.Position - hrp.CFrame.lookVector*-2.5})
+
+    local bp = Instance.new("BodyPosition", hrp)
+    bp.MaxForce = Vector3.new(10000000,10000000,10000000)
+    bp.P = 27500
+    bp.Position = targetPos
+    spawn(function()
+        wait(0.6)
+        bp:Destroy()
+    end)
+
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "shotshell_fire", hrp)
+    wait(0.1)
+
+    local queenanim2 = plr.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.animationSets.TPanimSets.special.queen_jump_attack)
+    queenanim2:Play()
+    wait(0.4)
+
+    workspace.ServerStuff.playAudio:FireServer({"general"}, "mineexplosion", hrp)
+    workspace.ServerStuff.applyGore:FireServer("shotshell_blast", char, plr, {hrp.Position + hrp.CFrame.lookVector*2.5 - Vector3.new(0,1.5,0)})
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "shotshell_punch_hit", hrp)
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "tick_explosion", hrp)
+
+    local offsets = {
+        Vector3.new(0,1.5,0),
+        Vector3.new(0,6.5,0),
+        Vector3.new(0,-3.5,0),
+        Vector3.new(0,1.5,5),
+        Vector3.new(5,1.5,0),
+        Vector3.new(-5,1.5,0),
+        Vector3.new(0,1.5,-5),
+    }
+    for _, offset in ipairs(offsets) do
+        workspace.ServerStuff.dealDamage:FireServer(
+            "shotshell",
+            {hrp.Position + hrp.CFrame.lookVector*2.5 - offset}
+        )
+    end
+
+    wait(0.4)
+    workspace.ServerStuff.playAudio:FireServer({"perks"}, "shotshell_pump", hrp)
+end
+
+local cooldown = false
+ms.KeyDown:connect(function(Key)
+    if Key == enemykey and active == true then
+        if cooldown == false then
+            cooldown = true
+            local closestDistance, closestHumanoid = math.huge, nil
+            for _, humanoid in ipairs(workspace.activeHostiles:GetDescendants()) do
+                if humanoid:IsA("Humanoid") then
+                    local humanModel = humanoid:FindFirstAncestorOfClass("Model")
+                    if humanModel and humanModel.PrimaryPart then
+                        local distance = lp:DistanceFromCharacter(humanModel.PrimaryPart.Position)
+                        if distance < closestDistance then
+                            closestDistance = distance
+                            closestHumanoid = humanModel
+                        end
+                    end
+                end
+            end
+            if closestHumanoid ~= nil then
+                doAttack(closestHumanoid.HumanoidRootPart.Position)
+            end
+            wait(0) -- usage cooldown
+            cooldown = false
+        end
+    end
+
+    if Key == cursorkey and active == true then
+        if cooldown == false then
+            cooldown = true
+            doAttack(ms.hit.Position)
+            wait(0) -- usage cooldown
+            cooldown = false
+        end
+    end
+
+    if Key == "n" and active == true then
+        active = false
+    end
+end)
+
+game.Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+    wait(0.25)
+    local queenanim = lp.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.animationSets.TPanimSets.global.queen_fall)
+    queenanim:Play()
+    queenanim:AdjustSpeed(0.75)
+    wait(0.2)
+    local hvtList = game.ReplicatedStorage.soundLibrary.AGENT.hvt:GetChildren()
+    local randSound = hvtList[math.random(1,#hvtList)].Name
+    workspace.ServerStuff.playAudio:FireServer({"AGENT","hvt"}, randSound, lp.Character.HumanoidRootPart)
+    workspace.ServerStuff.playAudio:FireServer({"AGENT","hvt"}, randSound, lp.Character.HumanoidRootPart)
+end)
+
+game.Players.LocalPlayer.PlayerGui.ChildAdded:Connect(function(g)
+    if g.Name == "mainHUD" then
+        game:GetService("StarterGui"):SetCore("SendNotification",{Title="wait bro",Text="Spawn Found, Loading..."})
+        wait(3)
+        game:GetService("StarterGui"):SetCore("SendNotification",{Title="fucking awesome",Text="Loaded."})
+        game:GetService("StarterGui"):SetCore("SendNotification",{Title="CONTROLS",Text="7 to jump to nearest enemy"})
+        game:GetService("StarterGui"):SetCore("SendNotification",{Title="CONTROLS",Text="8 to jump to your cursor"})
+
+        lp.Character.Humanoid.Died:Connect(function()
+            wait(0.25)
+            local queenanim = lp.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.animationSets.TPanimSets.global.queen_fall)
+            queenanim:Play()
+            queenanim:AdjustSpeed(0.75)
+            wait(0.2)
+            local hvtList = game.ReplicatedStorage.soundLibrary.AGENT.hvt:GetChildren()
+            local randSound = hvtList[math.random(1,#hvtList)].Name
+            workspace.ServerStuff.playAudio:FireServer({"AGENT","hvt"}, randSound, lp.Character.HumanoidRootPart)
+            workspace.ServerStuff.playAudio:FireServer({"AGENT","hvt"}, randSound, lp.Character.HumanoidRootPart)
+        end)
+    end
+end)
+
+workspace.CurrentCamera.ChildAdded:Connect(function(idiot)
+    spawn(function()
+        wait(2)
+        if idiot:IsA("BasePart") then
+            idiot:Destroy()
+        end
+    end)
+end)
