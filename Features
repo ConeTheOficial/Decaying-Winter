@@ -1,0 +1,180 @@
+[+] Player
+ ├── [+] Health
+ │    ├── God Mode
+ │    ├──  God Mode 2
+ │    ├── Heal
+ │    ├── Infinite Health
+ │    ├── Infinite Stamina
+ │    └── No Fall Damage
+ │
+ ├── [+] Hunger/Thirst
+ │    ├── No Hunger (Toggle / Button)
+ │    └── No Thirst (Toggle / Button)
+ │
+ ├── [+] Effect removal
+ │    ├── Anti Debuff (Loop Automático)
+ │    ├── Remove Debuffs
+ │    └── Remove every effect
+ │
+ └── [+] Virus
+      ├── Reset Virus Stage
+      └── Reset Virus Timer
+
+
+[+] Player
+ ├── Stealth
+ ├── Auto Parry
+ ├── Parry with Fists
+ ├── Instant Use
+ ├── No Interaction Cooldown
+ ├── Infinite Aux
+ ├── Loop Speed (WalkSpeed)
+ ├── FOV Changer
+ └── Interaction Reach
+
+
+[+] Items
+ ├── Bring Every Item
+ ├── Bring Stims
+ ├── Bring Weapons
+ ├── Bring Blueprints
+ ├── Bring Health
+ ├── Bring Traps
+ ├── Bring Explosives
+ ├── Collect Every Ammo
+ ├── Interaction Aura
+ ├── Open Every Locker / Crate
+ ├── Scrap Spawner
+ └── Ignore AntiCollect Filter
+
+
+[+] Aim
+ ├── Silent Aim
+ ├── Wallbang
+ └── Always Headshot
+
+
+[+] Perks
+ ├── No Cooldown
+ ├── No Arbiter Knockback
+ ├── Infinite Arbiter Range
+ ├── Easier / Auto LongShot
+ ├── Arbiter Spam
+ ├── Instant Apostle Throw
+ ├── Instant Sovereign Dagger
+ ├── Instant Mindflayer Throw
+ ├── Instant Artillerist Shoot
+ ├── Remove Goggles Cracks
+ ├── Auto Heal Apostle Friends
+ ├── Infect All
+ └── Mindkill Every Hostile
+
+
+[+] Perk Basestats
+ ├── No Craft Cost
+ ├── Anti Hanger
+ ├── No Fall DMG
+ ├── Anti Grapple
+ ├── Can Use Aux / Aim / Scrapper
+ ├── No Drop Ranged
+ └── [+] Basestats Modifier
+      ├── atkmod
+      ├── defmod
+      ├── reloadmod
+      └── etc..
+
+
+[+] Effects
+ ├── Effects Give (Debuffs and buffs)
+ ├── Anti Burn
+ ├── Anti Bleed
+ ├── Anti Cripple
+ ├── Anti Fracture
+ ├── Anti Trap
+ ├── No Morale
+ ├── Anti Storm
+ ├── No Tinnitus
+ ├── No Vomit
+ ├── Virus Block
+ └── Infinite Lazarus Effect
+
+
+[+] Weapon
+ ├── Firerate Modifier
+ ├── No Recoil
+ ├── No Inaccuracy
+ ├── Full Auto
+ ├── Riskrunner RPM Custom
+ └── [+] Melee Editor
+      ├── Light Damage
+      ├── Heavy Damage
+      ├── Speed
+      ├── Range
+      └── Wound Rating
+
+
+[+] ESP
+ ├── Ammo ESP
+ ├── Players ESP
+ ├── Hostiles ESP
+ ├── WeaponDrops ESP
+ ├── Stims ESP
+ ├── Blueprints ESP
+ ├── Pills ESP
+ ├── Health ESP
+ ├── Traps ESP
+ └── Explosives ESP
+
+
+[+] Hostiles
+ ├── Kill Aura
+ ├── Kill All
+ ├── Arbiter Kill Aura
+ ├── Arbiter Kill All
+ ├── Hitbox Expander
+ ├── Bring Hostiles
+ └── Always Headshot
+
+
+[+] Misc
+ ├── Prophet Scan
+ ├── Infinite Scan Range
+ ├── Anti Kick
+ ├── OG DW Soundtracks
+ ├── Spam Lazarus Device
+ ├── Remove Storm Ambience
+ ├── Remove Agent Voices
+ ├── Infinite Yield Loader
+ └── [+] Music Player
+      ├── Live to Forget
+      └── Epic Scene
+
+
+[+] Fun
+ ├── All Shots Laser
+ ├── Koldera Black
+ ├── Explode Yourself
+ ├── Hologram Spam
+ └── Sledge Queen Skills
+
+
+[+] Teleports
+ ├── Decaying Winter
+ ├── Decaying Winter Nightly
+ └── Decaying Winter Legacy
+
+
+[+] Chat Commands
+ ├── :find (item)
+ ├── :getammo
+ ├── :fill
+ ├── :nohunger
+ ├── :nothirst
+ ├── :heal
+ ├── :novirus
+ ├── :killall
+ ├── :killaura
+ ├── :kadistance
+ ├── :cig
+ ├── :uncig
+ └── :cmds
