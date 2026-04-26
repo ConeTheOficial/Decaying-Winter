@@ -1,68 +1,62 @@
-local player = game.Players.LocalPlayer
-local bg = player.PlayerGui:WaitForChild("mainHUD"):WaitForChild("TabMenu"):WaitForChild("bg")
+-- bypass
+local success, err = pcall(function()
+    do
+        for _, v in pairs(getgc()) do
+            if type(v) == "function" then
+                local name = debug.info(v, "n")
+                if name == "b" then
+                    hookfunction(v, newcclosure(function()
+                        return coroutine.yield()
+                    end))
+                end
+            end
+        end
+    end
+end)
 
-if bg:FindFirstChild("CommandBar") then
-    bg:FindFirstChild("CommandBar"):Destroy()
+if success then
+    print("Success")
+else
+    local player = game.Players.LocalPlayer
+    if player then
+        player:Kick("Script won't work on Solara and Xeno")
+    end
+end
+task.wait(0.5)
+-- bypass
+local env = getrenv()
+local list = env._G.list
+local pseed = env._G.pseed
+
+if not list or not pseed then
+    return
 end
 
-local frame = Instance.new("Frame")
-frame.Name = "CommandBar"
-frame.Size = UDim2.new(0.45, 0, 0, 36)
-frame.Position = UDim2.new(0, 8, 1, -190)
-frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-frame.BackgroundTransparency = 0.4
-frame.BorderSizePixel = 0
-frame.ZIndex = 10
-frame.Parent = bg
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local RS = game:GetService("ReplicatedStorage")
 
-local topBorder = Instance.new("Frame")
-topBorder.Size = UDim2.new(1, 0, 0, 1)
-topBorder.Position = UDim2.new(0, 0, 0, 0)
-topBorder.BackgroundColor3 = Color3.fromRGB(220, 180, 60)
-topBorder.BorderSizePixel = 0
-topBorder.ZIndex = 11
-topBorder.Parent = frame
+local backpack = player:WaitForChild("Backpack")
+local mainHandler = backpack:WaitForChild("mainHandler")
 
-local prefix = Instance.new("TextLabel")
-prefix.Size = UDim2.new(0, 24, 1, 0)
-prefix.Position = UDim2.new(0, 4, 0, 0)
-prefix.BackgroundTransparency = 1
-prefix.Text = "//"
-prefix.TextColor3 = Color3.fromRGB(220, 180, 60)
-prefix.Font = Enum.Font.Code
-prefix.TextSize = 12
-prefix.TextXAlignment = Enum.TextXAlignment.Center
-prefix.ZIndex = 11
-prefix.Parent = frame
+local function resolveWait()
+    while true do
+        local result = workspace.ServerStuff.ask:InvokeServer(mainHandler.Name, true)
+        if result then
+            local index = result
+            local step = list[index]
+            local remote = step and pseed[step]
+            if remote then
+                return remote, index, step
+            end
+        end
+        task.wait(0.1)
+    end
+end
 
-local input = Instance.new("TextBox")
-input.Name = "Input"
-input.Size = UDim2.new(1, -70, 1, 0)
-input.Position = UDim2.new(0, 28, 0, 0)
-input.BackgroundTransparency = 1
-input.Text = ""
-input.PlaceholderText = "spawn <item name>"
-input.PlaceholderColor3 = Color3.fromRGB(120, 100, 40)
-input.TextColor3 = Color3.fromRGB(255, 255, 255)
-input.Font = Enum.Font.Code
-input.TextSize = 12
-input.TextXAlignment = Enum.TextXAlignment.Left
-input.ClearTextOnFocus = true
-input.ZIndex = 11
-input.Parent = frame
-
-local status = Instance.new("TextLabel")
-status.Name = "Status"
-status.Size = UDim2.new(0, 36, 1, 0)
-status.Position = UDim2.new(1, -38, 0, 0)
-status.BackgroundTransparency = 1
-status.Text = "READY"
-status.TextColor3 = Color3.fromRGB(100, 220, 100)
-status.Font = Enum.Font.Code
-status.TextSize = 12
-status.TextXAlignment = Enum.TextXAlignment.Right
-status.ZIndex = 11
-status.Parent = frame
+local remote, index, step = resolveWait()
+_G.Code = remote
+print("code:", remote)
 
 local Weapons = {
     ["Juggernaut Box"] = "JBox";
@@ -126,49 +120,141 @@ local Weapons = {
     ["Used Stim"] = "TStim"; ["Hemostatic Zanustin"] = "AdrStim"; ["Crafted Splint"] = "CRSplint";
 }
 
-local RS = game:GetService("ReplicatedStorage")
+local function createUI()
+    local mainHUD = player.PlayerGui:FindFirstChild("mainHUD")
+    if not mainHUD then return end
 
-local function setStatus(text, color)
-    status.Text = text
-    status.TextColor3 = color
-    task.delay(2, function()
-        status.Text = "RDY"
-        status.TextColor3 = Color3.fromRGB(100, 220, 100)
+    local tabMenu = mainHUD:WaitForChild("TabMenu", 10)
+    if not tabMenu then return end
+
+    local bg = tabMenu:WaitForChild("bg", 10)
+    if not bg then return end
+
+    if bg:FindFirstChild("CommandBar") then
+        bg:FindFirstChild("CommandBar"):Destroy()
+    end
+
+    local frame = Instance.new("Frame")
+    frame.Name = "CommandBar"
+    frame.Size = UDim2.new(0.45, 0, 0, 36)
+    frame.Position = UDim2.new(0, 8, 1, -190)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.4
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 10
+    frame.Parent = bg
+
+    local topBorder = Instance.new("Frame")
+    topBorder.Size = UDim2.new(1, 0, 0, 1)
+    topBorder.Position = UDim2.new(0, 0, 0, 0)
+    topBorder.BackgroundColor3 = Color3.fromRGB(220, 180, 60)
+    topBorder.BorderSizePixel = 0
+    topBorder.ZIndex = 11
+    topBorder.Parent = frame
+
+    local prefix = Instance.new("TextLabel")
+    prefix.Size = UDim2.new(0, 24, 1, 0)
+    prefix.Position = UDim2.new(0, 4, 0, 0)
+    prefix.BackgroundTransparency = 1
+    prefix.Text = "//"
+    prefix.TextColor3 = Color3.fromRGB(220, 180, 60)
+    prefix.Font = Enum.Font.Code
+    prefix.TextSize = 12
+    prefix.TextXAlignment = Enum.TextXAlignment.Center
+    prefix.ZIndex = 11
+    prefix.Parent = frame
+
+    local input = Instance.new("TextBox")
+    input.Name = "Input"
+    input.Size = UDim2.new(1, -70, 1, 0)
+    input.Position = UDim2.new(0, 28, 0, 0)
+    input.BackgroundTransparency = 1
+    input.Text = ""
+    input.PlaceholderText = "spawn <item name>"
+    input.PlaceholderColor3 = Color3.fromRGB(120, 100, 40)
+    input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.Font = Enum.Font.Code
+    input.TextSize = 12
+    input.TextXAlignment = Enum.TextXAlignment.Left
+    input.ClearTextOnFocus = true
+    input.ZIndex = 11
+    input.Parent = frame
+
+    local status = Instance.new("TextLabel")
+    status.Name = "Status"
+    status.Size = UDim2.new(0, 36, 1, 0)
+    status.Position = UDim2.new(1, -38, 0, 0)
+    status.BackgroundTransparency = 1
+    status.Text = "READY"
+    status.TextColor3 = Color3.fromRGB(100, 220, 100)
+    status.Font = Enum.Font.Code
+    status.TextSize = 12
+    status.TextXAlignment = Enum.TextXAlignment.Right
+    status.ZIndex = 11
+    status.Parent = frame
+
+    local function setStatus(text, color)
+        status.Text = text
+        status.TextColor3 = color
+        task.delay(2, function()
+            status.Text = "RDY"
+            status.TextColor3 = Color3.fromRGB(100, 220, 100)
+        end)
+    end
+
+    local function craftWeapon(weaponValue)
+        local blueprint = "workbenchblueprint" .. weaponValue
+        local code = _G.Code
+
+        local workbench = workspace.Interactables:FindFirstChild("Workbench")
+            or workspace.InteractablesNoDel:FindFirstChild("Workbench")
+
+        if not workbench then
+            setStatus("ERR", Color3.fromRGB(220, 60, 60))
+            return
+        end
+
+        if not player.Character then return end
+
+        setStatus("...", Color3.fromRGB(220, 180, 60))
+
+        local originalCFrame = player.Character:GetPivot()
+        player.Character:PivotTo(workbench:GetPivot() + Vector3.new(0, 5, 0))
+
+        RS.Interactables.interaction:FireServer(workbench, blueprint, code)
+        task.wait(1.7)
+        RS.Interactables.interaction:FireServer(workbench, "workbench")
+
+        task.wait(8)
+        player.Character:PivotTo(originalCFrame)
+
+        setStatus("OK!", Color3.fromRGB(100, 220, 100))
+    end
+
+    input.FocusLost:Connect(function(enterPressed)
+        if not enterPressed then return end
+        local query = input.Text:lower():gsub("^/?spawn%s*", "")
+        if query == "" then return end
+        input.Text = ""
+
+        for displayName, realName in pairs(Weapons) do
+            if displayName:lower():find(query, 1, true) or realName:lower():find(query, 1, true) then
+                task.spawn(craftWeapon, realName)
+                return
+            end
+        end
+
+        setStatus("???", Color3.fromRGB(220, 60, 60))
     end)
 end
 
-local function craftWeapon(weaponValue)
-    local blueprint = "workbenchblueprint" .. weaponValue
-    local workbench = workspace.Interactables:FindFirstChild("Workbench")
-    if not workbench then
-        setStatus("ERR", Color3.fromRGB(220, 60, 60))
-        return
+player.PlayerGui.ChildAdded:Connect(function(child)
+    if child.Name == "mainHUD" then
+        task.wait(0.5)
+        createUI()
     end
-    if not player.Character then return end
-
-    setStatus("...", Color3.fromRGB(220, 180, 60))
-    local originalCFrame = player.Character:GetPivot()
-    player.Character:PivotTo(workbench:GetPivot() + Vector3.new(0, 5, 0))
-    RS.Interactables.interaction:FireServer(workbench, blueprint)
-    task.wait(1.7)
-    RS.Interactables.interaction:FireServer(workbench, "workbench")
-    task.wait(8)
-    player.Character:PivotTo(originalCFrame)
-    setStatus("OK!", Color3.fromRGB(100, 220, 100))
-end
-
-input.FocusLost:Connect(function(enterPressed)
-    if not enterPressed then return end
-    local query = input.Text:lower():gsub("^/?spawn%s*", "")
-    if query == "" then return end
-    input.Text = ""
-
-    for displayName, realName in pairs(Weapons) do
-        if displayName:lower():find(query, 1, true) or realName:lower():find(query, 1, true) then
-            task.spawn(craftWeapon, realName)
-            return
-        end
-    end
-
-    setStatus("???", Color3.fromRGB(220, 60, 60))
 end)
+
+if player.PlayerGui:FindFirstChild("mainHUD") then
+    createUI()
+end
